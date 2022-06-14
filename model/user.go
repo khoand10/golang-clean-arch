@@ -11,5 +11,5 @@ type User struct {
 }
 
 func (u *User) Create() {
-	result := db.Create(&user)
+	// result := db.Create(&user)
 }

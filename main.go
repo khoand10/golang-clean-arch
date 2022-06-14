@@ -8,13 +8,15 @@ import (
 )
 
 func main() {
-	root := api.Init()
+	//root := api.Init()
+	handler := api.NewHandler()
 
 	_, closeFunc, err := database.InitSqlite()
 	if err != nil {
 		return
 	}
-	log.Fatal(http.ListenAndServe(":8080", root))
+	log.Fatal(http.ListenAndServe(":8080", handler))
+
 	defer func() {
 		closeFunc()
 	}()

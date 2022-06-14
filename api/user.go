@@ -1,13 +1,32 @@
 package api
 
 import (
+	"github.com/gorilla/mux"
+	"golang-clean-arch/modules/user/service"
 	"golang-clean-arch/utils/web"
 	"net/http"
 )
 
-func (router *Routes) InitUser() {
-	router.Users.HandleFunc("", GetUsers).Methods("GET")
+type UserHandler struct {
+	//*ErrorHandler
+	userService service.UserService
+	//log             bot.Logger
+	//permissions     *service.PermissionsService
 }
+
+func NewUserHandler(router *mux.Router, userService service.UserServiceImpl) *UserHandler {
+	handler := &UserHandler{
+		userService: userService,
+	}
+	userRouter := router.PathPrefix("/users").Subrouter()
+	userRouter.HandleFunc("", handler.GetUsers).Methods(http.MethodGet)
+
+	return handler
+}
+
+//func (router *Routes) InitUser() {
+//	router.Users.HandleFunc("", GetUsers).Methods(http.MethodGet)
+//}
 
 type (
 	User struct {
@@ -17,11 +36,10 @@ type (
 	}
 )
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
-	user := &User{
-		FirstName: "Khoa",
-		LastName:  "Nguyen",
-		Email:     "khoand@gmail.com",
+func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
+	user, err := h.userService.GetUsers()
+	if err != nil {
+		web.ReturnJSON(w, nil, http.StatusBadRequest)
 	}
 	web.ReturnJSON(w, user, http.StatusOK)
 }
